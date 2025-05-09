@@ -2,8 +2,32 @@
 <html>
     <head>
         <link rel="stylesheet" href="index.css">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     </head>
     <body>
+        <div class="banner">
+            <img src="assets/parrot.png" alt="Perroquet" class="parrot">
+            <div class="banner-text">
+                <h1>PollyGlot</h1>
+                <p>Perfect Translation Every Time</p>
+            </div>
+        </div>
+        <div class="container">
+            <div class="translate-text">
+                <h2>Text to translate 👇</h2>
+                <textarea class="input-text" placeholder="write something here..."></textarea>
+            </div>
+            <div class="select">
+                <h2>Select language 👇</h2>
+                <div class="language-options">
+                    <label><input type="radio" name="lang" value="fr" checked> Français <img src="assets/fr-flag.png" alt="Français" class="flag"></label>
+                    <label><input type="radio" name="lang" value="es"> Espagnol <img src="assets/sp-flag.png" alt="Espagnol" class="flag"></label>
+                    <label><input type="radio" name="lang" value="jp"> Japonais <img src="assets/jpn-flag.png" alt="Japonais" class="flag"></label>
+                </div>
+                <button class="translate">Translate</button>
+                <div id="output"></div>
+            </div>
+        </div>
         <!-- Your HTML here -->
         <script src="index.js" type="module"></script>
     </body>
