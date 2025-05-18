@@ -247,3 +247,111 @@ body {
   color: #2ecc40;
   font-size: 1.3rem;
 }
+
+/* === Chat UI === */
+.chat-history {
+  flex: 1 1 auto;
+  background: #f7f7fa;
+  border-radius: 12px;
+  padding: 18px 12px 18px 12px;
+  margin: 12px 0;
+  overflow-y: auto;
+  min-height: 200px;
+  max-height: 55vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 2px 8px rgba(57, 57, 196, 0.07);
+}
+
+.chat-message {
+  max-width: 75%;
+  padding: 10px 16px;
+  border-radius: 18px;
+  font-size: 1.05rem;
+  word-break: break-word;
+  margin-bottom: 2px;
+  box-shadow: 0 1px 4px rgba(57, 57, 196, 0.04);
+}
+
+.chat-message.user {
+  align-self: flex-end;
+  background: #d1e7ff;
+  color: #1a237e;
+  border-bottom-right-radius: 6px;
+}
+
+.chat-message.assistant {
+  align-self: flex-start;
+  background: #e8f5e9;
+  color: #256029;
+  border-bottom-left-radius: 6px;
+}
+
+.chat-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.chat-input {
+  flex: 1 1 auto;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #bdbdbd;
+  font-size: 1rem;
+  background: #fff;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.chat-input:focus {
+  border: 1.5px solid #2323a5;
+}
+
+.send-message {
+  background: rgb(57, 57, 196);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(57, 57, 196, 0.1);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.send-message:hover,
+.send-message:focus {
+  background: #2323a5;
+  transform: translateY(-2px) scale(1.04);
+}
+
+@media (max-width: 600px) {
+  .chat-history {
+    max-height: 40vh;
+    padding: 10px 4px;
+    font-size: 0.98rem;
+  }
+  .chat-message {
+    font-size: 0.98rem;
+    padding: 8px 10px;
+  }
+  .chat-input {
+    font-size: 0.98rem;
+    padding: 8px;
+  }
+  .send-message {
+    font-size: 1rem;
+    padding: 8px 12px;
+  }
+}

@@ -13,19 +13,17 @@
             </div>
         </div>
         <div class="container">
-            <div class="translate-text">
-                <h2>Text to translate 👇</h2>
-                <textarea class="input-text" placeholder="write something here..."></textarea>
-            </div>
-            <div class="select">
-                <h2>Select language 👇</h2>
+            <div class="chat-history"></div>
+            <div class="chat-controls">
                 <div class="language-options">
                     <label><input type="radio" name="lang" value="fr" checked> Français <img src="assets/fr-flag.png" alt="Français" class="flag"></label>
                     <label><input type="radio" name="lang" value="es"> Espagnol <img src="assets/sp-flag.png" alt="Espagnol" class="flag"></label>
                     <label><input type="radio" name="lang" value="jp"> Japonais <img src="assets/jpn-flag.png" alt="Japonais" class="flag"></label>
                 </div>
-                <button class="translate">Translate</button>
-                <div id="output"></div>
+                <div class="chat-input-row">
+                    <input type="text" class="chat-input" placeholder="Écris ton message ici...">
+                    <button class="send-message">Envoyer</button>
+                </div>
             </div>
         </div>
         <!-- Your HTML here -->
