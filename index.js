@@ -1,69 +1,60 @@
-// Remplace 'VOTRE_CLE_API_OPENAI' par ta vraie clé API OpenAI (attention à la sécurité !)
-const OPENAI_API_KEY = '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';
+// === Nouvelle logique de chat ===
 
-// Gestion du clic sur le bouton Translate
-// Utilise la classe 'translate' comme dans le HTML
+const chatHistoryDiv = document.querySelector('.chat-history');
+const chatInput = document.querySelector('.chat-input');
+const sendBtn = document.querySelector('.send-message');
+let chatHistory = [];
 
-document.querySelector('.translate').addEventListener('click', async function () {
-  const inputText = document.querySelector('.input-text').value;
+function renderChat() {
+  chatHistoryDiv.innerHTML = '';
+  chatHistory.forEach(msg => {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-message ' + msg.role;
+    msgDiv.innerHTML = `<strong>${msg.role === 'user' ? 'Vous' : 'PollyGlot'} :</strong> <span>${msg.content}</span>`;
+    chatHistoryDiv.appendChild(msgDiv);
+  });
+  chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+}
+
+async function handleSend() {
+  const inputText = chatInput.value.trim();
   const selectedLang = document.querySelector('input[name="lang"]:checked').value;
-
-  if (!inputText.trim()) {
-    alert("Please write something to translate.");
-    return;
-  }
-
-  // Appel à l'API pour traduire
+  if (!inputText) return;
+  // Ajoute le message utilisateur à l'historique
+  chatHistory.push({ role: 'user', content: inputText });
+  renderChat();
+  chatInput.value = '';
+  // Appel API pour la traduction
   const translation = await translateText(inputText, selectedLang);
+  chatHistory.push({ role: 'assistant', content: translation });
+  renderChat();
+}
 
-  // Masquer la div .select et afficher la traduction dans .translate-text
-  const selectDiv = document.querySelector('.select');
-  if (selectDiv) selectDiv.style.display = 'none';
-
-  const translateTextDiv = document.querySelector('.translate-text');
-  let traductionDiv = document.querySelector('.traduction');
-  if (!traductionDiv) {
-    traductionDiv = document.createElement('div');
-    traductionDiv.className = 'traduction';
-    translateTextDiv.appendChild(traductionDiv);
+sendBtn.addEventListener('click', handleSend);
+chatInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleSend();
   }
-  traductionDiv.innerHTML = `<h2>Traduction :</h2><div>${translation}</div>`;
 });
 
 async function translateText(text, targetLang) {
-  const languageMap = {
-    fr: 'French',
-    es: 'Spanish',
-    jp: 'Japanese'
-  };
-  const messages = [
-    { role: 'system', content: "You are a professional translator." },
-    { role: "user", content: `Translate the following text to ${languageMap[targetLang]}:\n\n${text}` }
-  ];
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
+    const response = await fetch('http://localhost:3001/api/translate', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENAI_API_KEY}`
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        model: "gpt-4.1",
-        messages: messages,
-        max_tokens: 300
-      })
+      body: JSON.stringify({ text, targetLang })
     });
-   
     const data = await response.json();
-    if (data.choices && data.choices[0] && data.choices[0].message) {
-      return data.choices[0].message.content;
+    if (data.translation) {
+      return data.translation;
     } else {
-      return "Aucune traduction reçue.";
-      
+      return data.error || 'Aucune traduction reçue.';
     }
-    
   } catch (error) {
-    console.error("❌ API error:", error);
+    console.error('❌ API error:', error);
     return "An error occurred while translating.";
   }
 }
