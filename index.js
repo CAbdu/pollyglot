@@ -1,5 +1,5 @@
 // Remplace 'VOTRE_CLE_API_OPENAI' par ta vraie clé API OpenAI (attention à la sécurité !)
-const OPENAI_API_KEY = 'VOTRE_CLE_API_OPENAI';
+const OPENAI_API_KEY = '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';
 
 // Gestion du clic sur le bouton Translate
 // Utilise la classe 'translate' comme dans le HTML
@@ -16,14 +16,18 @@ document.querySelector('.translate').addEventListener('click', async function ()
   // Appel à l'API pour traduire
   const translation = await translateText(inputText, selectedLang);
 
-  // Affichage du résultat (ajoute un élément avec id="output" dans ton HTML si besoin)
-  let output = document.getElementById('output');
-  if (!output) {
-    output = document.createElement('div');
-    output.id = 'output';
-    document.querySelector('.container').appendChild(output);
+  // Masquer la div .select et afficher la traduction dans .translate-text
+  const selectDiv = document.querySelector('.select');
+  if (selectDiv) selectDiv.style.display = 'none';
+
+  const translateTextDiv = document.querySelector('.translate-text');
+  let traductionDiv = document.querySelector('.traduction');
+  if (!traductionDiv) {
+    traductionDiv = document.createElement('div');
+    traductionDiv.className = 'traduction';
+    translateTextDiv.appendChild(traductionDiv);
   }
-  output.textContent = translation;
+  traductionDiv.innerHTML = `<h2>Traduction :</h2><div>${translation}</div>`;
 });
 
 async function translateText(text, targetLang) {
@@ -44,17 +48,20 @@ async function translateText(text, targetLang) {
         "Authorization": `Bearer ${OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "gpt-4",
+        model: "gpt-4.1",
         messages: messages,
         max_tokens: 300
       })
     });
+   
     const data = await response.json();
     if (data.choices && data.choices[0] && data.choices[0].message) {
       return data.choices[0].message.content;
     } else {
       return "Aucune traduction reçue.";
+      
     }
+    
   } catch (error) {
     console.error("❌ API error:", error);
     return "An error occurred while translating.";

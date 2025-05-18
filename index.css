@@ -38,7 +38,7 @@ body {
   margin: 5px 8px 5px 5px;
   border-top-left-radius: 7px;
   border-top-right-radius: 7px;
-  background: url("assets/worldmap.png") center center/cover no-repeat;
+  background: url('assets/worldmap.png') center center/cover no-repeat;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -227,4 +227,23 @@ body {
 .translate:focus {
   background: #2323a5;
   transform: translateY(-2px) scale(1.04);
+}
+
+.traduction {
+  margin-top: 24px;
+  padding: 18px 24px;
+  background: #f8f8ff;
+  border: 1px solid #d1d1e0;
+  border-radius: 10px;
+  color: #2323a5;
+  font-size: 1.2rem;
+  box-shadow: 0 2px 8px rgba(57, 57, 196, 0.08);
+  text-align: center;
+  width: 80%;
+  max-width: 600px;
+}
+.traduction h2 {
+  margin-top: 0;
+  color: #2ecc40;
+  font-size: 1.3rem;
 }
