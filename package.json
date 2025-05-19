@@ -1,19 +1,22 @@
 {
-  "name": "Scrim-s05rqc4",
+  "name": "scrim-s05rqc4",
   "description": "https://scrimba.com/the-ai-engineer-path-c02v/~0o",
   "type": "module",
   "scripts": {
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^16.5.0",
-    "express": "^5.1.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "node-fetch": "^3.3.2",
-    "vite": "latest"
+    "openai": "^4.28.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "vite": "^4.5.2"
+  }
 }

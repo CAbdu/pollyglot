@@ -1,84 +1,130 @@
 import express from 'express';
-import fetch from 'node-fetch';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import OpenAI from 'openai';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Afficher le chemin du fichier .env
-const envPath = join(__dirname, '.env');
-console.log('Looking for .env file at:', envPath);
-
-// Charger les variables d'environnement depuis .env
-dotenv.config({ path: envPath });
+dotenv.config();
 
 const app = express();
-const PORT = 3001;
+const port = 3001;
 
-app.use(cors());
-app.use(express.json());
-
-// Vérifier que la clé API est bien chargée
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-if (!OPENAI_API_KEY) {
-  console.error('❌ ERREUR: OPENAI_API_KEY non trouvée dans le fichier .env');
-  process.exit(1);
-}
-
-// Afficher les 4 premiers caractères de la clé pour vérifier
-console.log('API Key loaded:', OPENAI_API_KEY ? `Yes (starts with: ${OPENAI_API_KEY.substring(0, 4)}...)` : 'No');
-
-app.post('/api/translate', async (req, res) => {
-  const { text, targetLang } = req.body;
-  console.log('Received request:', { text, targetLang });
-  
-  const languageMap = {
-    fr: 'French',
-    es: 'Spanish',
-    jp: 'Japanese'
-  };
-  const messages = [
-    { role: 'system', content: 'You are a professional translator.' },
-    { role: 'user', content: `Translate the following text to ${languageMap[targetLang]}:\n\n${text}` }
-  ];
-
-  const requestBody = {
-    model: 'gpt-4.1',
-    messages: messages,
-    max_tokens: 300
-  };
-
-  try {
-    console.log('Sending request to OpenAI with body:', JSON.stringify(requestBody, null, 2));
-    console.log('Using API key starting with:', OPENAI_API_KEY.substring(0, 7) + '...');
+// Configuration CORS plus permissive
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
     
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`
-      },
-      body: JSON.stringify(requestBody)
-    });
-    
-    const data = await response.json();
-    console.log('OpenAI response:', data);
-    
-    if (data.choices && data.choices[0] && data.choices[0].message) {
-      res.json({ translation: data.choices[0].message.content });
-    } else {
-      console.error('OpenAI API error response:', data);
-      res.status(500).json({ error: 'Aucune traduction reçue.' });
+    // Gérer les requêtes OPTIONS
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
     }
-  } catch (error) {
-    console.error('❌ API error:', error);
-    res.status(500).json({ error: 'Erreur lors de la traduction.' });
-  }
+    next();
 });
 
-app.listen(PORT, () => {
-  console.log(`Serveur de traduction démarré sur http://localhost:${PORT}`);
+app.use(express.json());
+
+// Vérification de la clé API
+if (!process.env.OPENAI_API_KEY) {
+    console.error('❌ ERREUR: OPENAI_API_KEY non trouvée dans le fichier .env');
+    process.exit(1);
+}
+
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+});
+
+// Fonction pour vérifier si l'API OpenAI est disponible
+async function checkOpenAIAvailability() {
+    try {
+        await openai.models.list();
+        return true;
+    } catch (error) {
+        console.error('Erreur de connexion à OpenAI:', error.message);
+        return false;
+    }
+}
+
+// Middleware pour vérifier la disponibilité de l'API
+async function checkAPI(req, res, next) {
+    const isAvailable = await checkOpenAIAvailability();
+    if (!isAvailable) {
+        return res.status(503).json({
+            error: 'Service temporairement indisponible',
+            details: 'Le service de correction/traduction est momentanément indisponible. Veuillez réessayer dans quelques instants.'
+        });
+    }
+    next();
+}
+
+app.post('/api/translate', checkAPI, async (req, res) => {
+    try {
+        const { text, targetLang } = req.body;
+        console.log('Received translation request:', { text, targetLang });
+        
+        const languageMap = {
+            fr: 'French',
+            es: 'Spanish',
+            jp: 'Japanese'
+        };
+
+        const completion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+                {
+                    role: "system",
+                    content: "You are a professional translator."
+                },
+                {
+                    role: "user",
+                    content: `Translate the following text to ${languageMap[targetLang]}:\n\n${text}`
+                }
+            ],
+            max_tokens: 300
+        });
+
+        const translation = completion.choices[0].message.content;
+        res.json({ translation });
+    } catch (error) {
+        console.error('Translation error:', error);
+        res.status(500).json({
+            error: 'Erreur lors de la traduction',
+            details: error.message
+        });
+    }
+});
+
+app.post('/api/correct', checkAPI, async (req, res) => {
+    try {
+        const { text } = req.body;
+        console.log('Received correction request:', { text });
+        
+        const completion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+                {
+                    role: "system",
+                    content: "You are a professional French language corrector. Correct any spelling, grammar, or punctuation errors in the text while maintaining its original meaning. Return only the corrected text without any explanations."
+                },
+                {
+                    role: "user",
+                    content: text
+                }
+            ],
+            max_tokens: 300
+        });
+
+        const correctedText = completion.choices[0].message.content;
+        res.json({ correctedText });
+    } catch (error) {
+        console.error('Correction error:', error);
+        res.status(500).json({
+            error: 'Erreur lors de la correction du texte',
+            details: error.message
+        });
+    }
+});
+
+app.listen(port, () => {
+    console.log(`Serveur démarré sur http://localhost:${port}`);
 }); 

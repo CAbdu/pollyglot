@@ -16,12 +16,13 @@
             <div class="chat-history"></div>
             <div class="chat-controls">
                 <div class="language-options">
-                    <label><input type="radio" name="lang" value="fr" checked> Français <img src="assets/fr-flag.png" alt="Français" class="flag"></label>
-                    <label><input type="radio" name="lang" value="es"> Espagnol <img src="assets/sp-flag.png" alt="Espagnol" class="flag"></label>
-                    <label><input type="radio" name="lang" value="jp"> Japonais <img src="assets/jpn-flag.png" alt="Japonais" class="flag"></label>
+                    <label data-lang="Français"><input type="radio" name="lang" value="fr" checked> <span>Français</span> <img src="assets/fr-flag.png" alt="Français" class="flag"></label>
+                    <label data-lang="Espagnol"><input type="radio" name="lang" value="es"> <span>Espagnol</span> <img src="assets/sp-flag.png" alt="Espagnol" class="flag"></label>
+                    <label data-lang="Japonais"><input type="radio" name="lang" value="jp"> <span>Japonais</span> <img src="assets/jpn-flag.png" alt="Japonais" class="flag"></label>
                 </div>
                 <div class="chat-input-row">
                     <input type="text" class="chat-input" placeholder="Écris ton message ici...">
+                    <button class="correct-message">Corriger</button>
                     <button class="send-message">Envoyer</button>
                 </div>
             </div>
